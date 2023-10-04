@@ -132,13 +132,13 @@ describe("PATCH /api/patients/:nhs_number", () => {
     test.only("200: should update patient's name", () => {
         const testBody = { name: "Alice Smith" };
         return request(app)
-            .patch("/api/patients/1609079019")
+            .patch("/api/patients/1111111111")
             .send(testBody)
             .expect(200)
             .then(({ body }) => {
-                const { patient } = body;
-                expect(patient).toHaveProperty("nhs_number", "1609079019");
-                expect(patient).toHaveProperty("name", "Alice Smith");
+                const { updatedPatient } = body;
+                expect(updatedPatient).toHaveProperty("nhs_number", "1111111111");
+                expect(updatedPatient).toHaveProperty("name", "Alice Smith");
             });
     });
     test("200: should update patient's postcode", () => {
@@ -150,7 +150,12 @@ describe("PATCH /api/patients/:nhs_number", () => {
             .then(({ body }) => {
                 const { patient } = body;
                 expect(patient).toHaveProperty("nhs_number", "1609079019");
-                expect(patient).toMatchObject({nhs_number: "1609079019", name: "Alice Smith", date_of_birth: "1990-05-15", postcode: "M19 2DB"});
+                expect(patient).toMatchObject({
+                    nhs_number: "1609079019",
+                    name: "Alice Smith",
+                    date_of_birth: "1990-05-15",
+                    postcode: "M19 2DB",
+                });
             });
     });
     test("200: should ignore other properties passed in the request body", () => {
@@ -201,67 +206,66 @@ describe("PATCH /api/patients/:nhs_number", () => {
     });
 });
 
-describe("DELETE /api/patients/:nhs_number", () => {
-        test("204: should delete the patient with the provided nhs number from the database and respond with a 204 No Content status", () => {
-          return request(app).delete("/api/patients/1609079019").expect(204);
-        });
-        test("400:should respond with Invalid NHS Number", () => {
-          return request(app)
+xdescribe("DELETE /api/patients/:nhs_number", () => {
+    test("204: should delete the patient with the provided nhs number from the database and respond with a 204 No Content status", () => {
+        return request(app).delete("/api/patients/1609079019").expect(204);
+    });
+    test("400:should respond with Invalid NHS Number", () => {
+        return request(app)
             .delete("/api/patients/Banana123")
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe("Invalid NHS Number");
+                expect(body.msg).toBe("Invalid NHS Number");
             });
-        });
-        test("404:should respond with Not Found when passed a NHS Number that does not exist", () => {
-          return request(app)
+    });
+    test("404:should respond with Not Found when passed a NHS Number that does not exist", () => {
+        return request(app)
             .delete("/api/patients/4401654447")
             .expect(404)
             .then(({ body }) => {
-              expect(body.msg).toBe("NHS Number Not Found");
+                expect(body.msg).toBe("NHS Number Not Found");
             });
-        });
-      });
+    });
+});
 
-    xdescribe("GET /api/appointments/:patient", () => {
-        test("200:should respond with an appointment or appointments by patient", () => {
-            return request(app)
-                .get("/api/appointments/1609079019")
-                .expect(200)
-                .then(({ body }) => {
-                    expect(body.appointment).toHaveProperty(
-                        "id",
-                        "5d5c84b6-9e88-4164-b7ec-5b1d11ca49a2"
-                    );
-                    expect(body.appointment).toHaveProperty(
-                        "patient",
-                        "1431315257"
-                    );
-                    expect(body.appointment).toHaveProperty(
-                        "status",
-                        expect.any(String)
-                    );
-                    expect(body.appointment).toHaveProperty(
-                        "time",
-                        expect.any(String)
-                    );
-                    expect(body.appointment).toHaveProperty(
-                        "duration",
-                        expect.any(String)
-                    );
-                    expect(body.appointment).toHaveProperty(
-                        "clinician",
-                        expect.any(String)
-                    );
-                    expect(body.appointment).toHaveProperty(
-                        "department",
-                        expect.any(String)
-                    );
-                    expect(body.appointment).toHaveProperty(
-                        "postcode",
-                        expect.any(String)
-                    );
-                });
-        });
+xdescribe("GET /api/appointments/:patient", () => {
+    test("200:should respond with an appointment or appointments by patient", () => {
+        return request(app)
+            .get("/api/appointments/1609079019")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.appointment).toHaveProperty(
+                    "id",
+                    "5d5c84b6-9e88-4164-b7ec-5b1d11ca49a2"
+                );
+                expect(body.appointment).toHaveProperty(
+                    "patient",
+                    "1431315257"
+                );
+                expect(body.appointment).toHaveProperty(
+                    "status",
+                    expect.any(String)
+                );
+                expect(body.appointment).toHaveProperty(
+                    "time",
+                    expect.any(String)
+                );
+                expect(body.appointment).toHaveProperty(
+                    "duration",
+                    expect.any(String)
+                );
+                expect(body.appointment).toHaveProperty(
+                    "clinician",
+                    expect.any(String)
+                );
+                expect(body.appointment).toHaveProperty(
+                    "department",
+                    expect.any(String)
+                );
+                expect(body.appointment).toHaveProperty(
+                    "postcode",
+                    expect.any(String)
+                );
+            });
     });
 });

@@ -2,6 +2,10 @@
 
 This is an MVP tool called the Patient Appointment Network Data Application (PANDA). The PANDA tracks patient demographic data and associated appointments for each patient.
 
+## Built in:
+
+- JS using Express and PSQL
+
 ## Getting Started
 
 ### Dependencies

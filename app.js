@@ -4,7 +4,9 @@ const {
     postPatients,
     patchPatientsByNhsNumber,
     deletePatientByNhsNumber,
-    // getAppointmentByPatient,
+    getAppointmentsByPatient,
+    postAppointmentByPatient,
+    patchAppointmentByPatient,
 } = require("./controllers");
 const {
     handlePsqlErrors,
@@ -24,11 +26,11 @@ app.patch("/api/patients/:nhs_number", patchPatientsByNhsNumber);
 
 app.delete("/api/patients/:nhs_number", deletePatientByNhsNumber);
 
-app.get("/api/appointments/:patient", getAppointmentByPatient);
+app.get("/api/appointments/:patient", getAppointmentsByPatient);
 
-app.post("/api/appointments/:patient", postAppointmentsByPatient);
+app.post("/api/appointments/:patient", postAppointmentByPatient);
 
-app.patch("/api/appointments/:patient", patchAppointmentsByPatient);
+app.patch("/api/appointments/:patient", patchAppointmentByPatient);
 
 app.all("*", (_, res) => {
     res.status(404).send({ status: 404, msg: "Route Not Found" });

@@ -1,6 +1,5 @@
 const { fetchPatient, insertPatient, updatePatient } = require("./models");
 const { validateNhsNumber } = require("./db/utils");
-const fs = require("fs/promises");
 
 exports.getPatientByNhsNumber = (req, res, next) => {
     const { nhs_number } = req.params;
@@ -23,15 +22,10 @@ exports.postPatients = (req, res, next) => {
 exports.patchPatientsByNhsNumber = (req, res, next) => {
     const { nhs_number } = req.params;
     const body = req.body;
-    const promises = [
-        updatePatient(nhs_number, body),
-        validateNhsNumber("patients", "nhs_number", nhs_number),
-    ];
-    Promise.all(promises)
-        .then((resolvedPromises) => {
-            console.log("reached here");
-            const patient = resolvedPromises[0];
-            res.status(200).send({ patient });
+    updatePatient(nhs_number, body)
+        .then((updatedPatient) => {
+            console.log(updatedPatient);
+            res.status(200).send({ updatedPatient });
         })
         .catch(next);
 };
@@ -49,11 +43,35 @@ exports.deletePatientByNhsNumber = (req, res, next) => {
         .catch(next);
 };
 
-// exports.getAppointmentByPatient = (req, res, next) => {
-//     const { nhs_number } = req.params;
-//     fetchAppointment(nhs_number)
-//         .then((appointment) => {
-//             res.status(200).send({ appointment });
-//         })
-//         .catch(next);
-// };
+exports.getAppointmentsByPatient = (req, res, next) => {
+    const { patient } = req.params;
+    fetchAppointment(patient)
+        .then((appointment) => {
+            res.status(200).send({ appointment });
+        })
+        .catch(next);
+};
+
+exports.postAppointmentByPatient = (req, res, next) => {
+    const newAppointment = req.body;
+    insertAppointment(newAppointment)
+        .then((appointment) => {
+            res.status(201).send({ appointment });
+        })
+        .catch(next);
+};
+
+exports.patchAppointmentByPatient = (req, res, next) => {
+    const { patient } = req.params;
+    const body = req.body;
+    const promises = [
+        updateAppointment(patient, body),
+        validateNhsNumber("appointments", "nhs_number", nhs_number),
+    ];
+    Promise.all(promises)
+        .then((resolvedPromises) => {
+            const appointment = resolvedPromises[0];
+            res.status(200).send({ appointment });
+        })
+        .catch(next);
+};

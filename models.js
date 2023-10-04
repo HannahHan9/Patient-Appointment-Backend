@@ -54,15 +54,43 @@ exports.insertPatient = ({ nhs_number, name, date_of_birth, postcode }) => {
 };
 
 exports.updatePatient = (nhs_number, body) => {
+    if (!validateNhsNumber(nhs_number)) {
+        return Promise.reject({
+            status: 400,
+            msg: "Invalid NHS Number",
+        });
+    }
     const { name, postcode } = body;
-    return db.query(`UPDATE patients SET name = $1, postcode = $2 WHERE nhs_number = $3;`, [
-        name, postcode,
-        nhs_number,
-    ]);
+    const valueToUpdate = name || postcode;
+    let fieldToUpdate = "name"
+    if(postcode){
+        fieldToUpdate = "postcode"
+    } else if (!name && !postcode){
+        return Promise.reject({
+            status: 400,
+            msg: "Cannot update invalid fields",
+        })
+    }
+    if (valueToUpdate === postcode && !validatePostcode(valueToUpdate)) {
+        return Promise.reject({
+            status: 400,
+            msg: "Invalid Postcode",
+        });
+    }
+    return db
+        .query(
+            `UPDATE patients SET ${fieldToUpdate} = $1 WHERE nhs_number = $2 RETURNING *;`,
+            [valueToUpdate, nhs_number]
+        )
+        .then(({ rows }) => {
+            return rows[0];
+        });
 };
 
-exports.fetchAppointment = (appointment) => {
-    if (!validateNhsNumber(nhs_number)) {
+exports.removePatient = () => {};
+
+exports.fetchAppointment = (patient) => {
+    if (!validateNhsNumber(patient)) {
         return Promise.reject({ status: 400, msg: "Invalid NHS Number" });
     }
     return db
@@ -80,3 +108,7 @@ exports.fetchAppointment = (appointment) => {
             }
         });
 };
+
+exports.insertAppointment = (appointment) => {};
+
+exports.updateAppointment = () => {};
