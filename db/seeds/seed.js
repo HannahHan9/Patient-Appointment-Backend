@@ -10,7 +10,7 @@ const seed = (patientsData, appointmentsData) => {
         })
         .then(() => {
             return db.query(
-                `CREATE TABLE patients (nhs_number VARCHAR(10) PRIMARY KEY, name VARCHAR(40) NOT NULL, date_of_birth DATE NOT NULL, postcode VARCHAR(8) NOT NULL);`
+                `CREATE TABLE patients (nhs_number VARCHAR(10) PRIMARY KEY, name VARCHAR(40) NOT NULL, date_of_birth VARCHAR(10) NOT NULL, postcode VARCHAR(8) NOT NULL);`
             );
         })
         .then(() => {
@@ -27,7 +27,6 @@ const seed = (patientsData, appointmentsData) => {
             return db.query(insertPatientsStr);
         })
         .then(() => {
-            console.log(appointmentsData)
             const formattedAppointments = formatAppointments(appointmentsData);
             const insertAppointmentsStr = format(
                 "INSERT INTO appointments (id, patient, status, time, duration, clinician, department, postcode) VALUES %L;",

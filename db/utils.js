@@ -30,4 +30,34 @@ const formatAppointments = (appointmentsData) => {
     );
 };
 
-module.exports = { formatPatients, formatAppointments };
+const validateNhsNumber = (nhs_number) => {
+    const lastDigit = parseInt(nhs_number[9]);
+    const firstNineDigits = nhs_number.split("").slice(0, -1);
+    let sumOfMultiplication = 0;
+    let factor = 10;
+    firstNineDigits.forEach((digit) => {
+        sumOfMultiplication += parseInt(digit) * factor;
+        factor--;
+    });
+    const dividedByEleven = sumOfMultiplication % 11;
+    const checkDigit = 11 - dividedByEleven;
+    return lastDigit === checkDigit;
+};
+
+const validateDateOfBirth = (date_of_birth) => {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    return regex.test(date_of_birth);
+};
+
+const validatePostcode = (postcode) => {
+    const regex = /^[A-Za-z]{1,2}\d{1,2}\s*\d[A-Za-z]{2}$/;
+    return regex.test(postcode)
+}
+// console.log(validateDateOfBirth("19972-04-05"));
+// console.log(validateNhsNumber("1953262716"))
+module.exports = {
+    formatPatients,
+    formatAppointments,
+    validateNhsNumber,
+    validateDateOfBirth, validatePostcode
+};
