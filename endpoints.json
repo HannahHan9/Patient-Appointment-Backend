@@ -1,0 +1,93 @@
+{
+    "GET /api/patients/:nhs_number": {
+        "description": "serves an object of a patient",
+        "queries": [],
+        "exampleResponse": {
+            "nhs_number": "1609079019",
+            "name": "Alice Johnson",
+            "date_of_birth": "1990-05-15",
+            "postcode": "SW1A 1AA"
+        }
+    },
+    "POST /api/patients": {
+        "description": "creates and serves a new patient",
+        "queries": [],
+        "requestBodyFormat": {
+            "nhs_number": "0240288238",
+            "name": "Mr Lawrence Lucas",
+            "date_of_birth": "1954-09-10",
+            "postcode": "N1 5ZG"
+        },
+        "exampleResponse": {
+            "nhs_number": "0240288238",
+            "name": "Mr Lawrence Lucas",
+            "date_of_birth": "1954-09-10",
+            "postcode": "N1 5ZG"
+        }
+    },
+    "PATCH /api/patients/:nhs_number": {
+        "description": "updates patient's name or postcode for the provided nhs number",
+        "queries": [],
+        "requestBodyFormat": {
+            "nhs_number": "1609079019",
+            "name": "Alice Smith",
+            "date_of_birth": "1990-05-15",
+            "postcode": "M19 2DB"
+        },
+        "exampleResponse": {
+            "nhs_number": "1609079019",
+            "name": "Alice Smith",
+            "date_of_birth": "1990-05-15",
+            "postcode": "M19 2DB"
+        }
+    },
+    "DELETE /api/patients/:nhs_number": {
+        "description": "deletes a patient with the provided nhs number",
+        "queries": [],
+        "exampleResponse": null
+    },
+    "GET /api/appointments/:patient": {
+        "description": "serves an appointment for the provided patient",
+        "queries": [],
+        "exampleResponse": {
+            "id": "5d5c84b6-9e88-4164-b7ec-5b1d11ca49a2",
+            "patient": "1609079019",
+            "status": "missed",
+            "time": "2022-10-28T10:30:00+01:00",
+            "duration": "30m",
+            "clinician": "Alice Johnson",
+            "department": "orthopaedics",
+            "postcode": "SW1A 1AA"
+        }
+    },
+    "POST /api/appointments/:patient": {
+        "description": "creates and serves a new appointment for the provided patient",
+        "queries": [],
+        "requestBodyFormat": {
+            // should the id on appointments table be a serial key as it will be automatically generated
+            "patient": "1609079019",
+            "status": "missed",
+            "time": "2022-10-28T10:30:00+01:00",
+            "duration": "30m",
+            "clinician": "Alice Johnson",
+            "department": "orthopaedics",
+            "postcode": "SW1A 1AA"
+        },
+        "exampleResponse": {
+            "id": "5d5c84b6-9e88-4164-b7ec-5b1d11ca49a2",
+            "patient": "1609079019",
+            "status": "missed",
+            "time": "2022-10-28T10:30:00+01:00",
+            "duration": "30m",
+            "clinician": "Alice Johnson",
+            "department": "orthopaedics",
+            "postcode": "SW1A 1AA"
+        }
+    },
+    "PATCH /api/appointments/:patient": {
+        "description": "updates an appointment for the provided patient",
+        "queries": [],
+        "requestBodyFormat": {},
+        "exampleResponse": {}
+    }
+}

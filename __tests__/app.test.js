@@ -213,7 +213,7 @@ describe("DELETE /api/patients/:nhs_number", () => {
               expect(body.msg).toBe("Invalid NHS Number");
             });
         });
-        test("404:should respond with Not Found when passed an id that does not exist", () => {
+        test("404:should respond with Not Found when passed a NHS Number that does not exist", () => {
           return request(app)
             .delete("/api/patients/4401654447")
             .expect(404)

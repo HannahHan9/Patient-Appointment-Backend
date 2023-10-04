@@ -2,7 +2,8 @@ const express = require("express");
 const {
     getPatientByNhsNumber,
     postPatients,
-    patchPatientsByNhsNumber, deletePatientByNhsNumber
+    patchPatientsByNhsNumber,
+    deletePatientByNhsNumber,
     // getAppointmentByPatient,
 } = require("./controllers");
 const {
@@ -21,14 +22,17 @@ app.post("/api/patients", postPatients);
 
 app.patch("/api/patients/:nhs_number", patchPatientsByNhsNumber);
 
-// app.delete("/api/patients/:nhs_number", deletePatientByNhsNumber);
+app.delete("/api/patients/:nhs_number", deletePatientByNhsNumber);
 
-// app.get("/api/appointments/:patient", getAppointmentByPatient);
+app.get("/api/appointments/:patient", getAppointmentByPatient);
 
-// app.post("/api/appointments/:patient", postAppointmentsByPatient);
+app.post("/api/appointments/:patient", postAppointmentsByPatient);
 
-// app.patch("/api/appointments/:patient", patchAppointmentsByPatient)
+app.patch("/api/appointments/:patient", patchAppointmentsByPatient);
 
+app.all("*", (_, res) => {
+    res.status(404).send({ status: 404, msg: "Route Not Found" });
+});
 
 app.use(handlePsqlErrors);
 

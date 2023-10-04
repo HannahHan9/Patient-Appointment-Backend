@@ -1,0 +1,25 @@
+{
+    "name": "patient-appointment-backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest",
+        "setup-dbs": "psql -f ./db/setup.sql",
+        "seed": "node ./db/seeds/run-seed.js",
+        "start": "node listen.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "supertest": "^6.3.3"
+    },
+    "dependencies": {
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "pg": "^8.11.3",
+        "pg-format": "^1.0.4"
+    }
+}
