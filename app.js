@@ -6,6 +6,7 @@ const {
     deletePatientByNhsNumber,
     getAppointmentsByPatient,
     postAppointmentByPatient,
+    checkMissedAppointments,
     // patchAppointmentByPatient,
 } = require("./controllers");
 const {
@@ -29,6 +30,12 @@ app.delete("/api/patients/:nhs_number", deletePatientByNhsNumber);
 app.get("/api/appointments/:patient", getAppointmentsByPatient);
 
 app.post("/api/appointments/:patient", postAppointmentByPatient);
+
+// checkMissedAppointments() - how do I stop this interfering with the tests?
+
+const fifteenMinutes = 15 * 60 * 1000;
+// setInterval(checkMissedAppointments, fifteenMinutes);
+// how would you test this function?
 
 // app.patch("/api/appointments/:patient", patchAppointmentByPatient);
 

@@ -5,6 +5,7 @@ const {
     removePatient,
     fetchAppointment,
     insertAppointment,
+    updateMissedAppointments,
 } = require("./models");
 
 exports.getPatientByNhsNumber = (req, res, next) => {
@@ -54,24 +55,26 @@ exports.getAppointmentsByPatient = (req, res, next) => {
 };
 
 exports.postAppointmentByPatient = (req, res, next) => {
+    const { patient } = req.params;
     const newAppointment = req.body;
-    insertAppointment(newAppointment)
+    insertAppointment({...newAppointment, patient})
         .then((appointment) => {
             res.status(201).send({ appointment });
         })
         .catch(next);
 };
 
+exports.checkMissedAppointments = (req, res, next) => {
+    updateMissedAppointments()
+        .then(() => {})
+        .catch(next);
+};
+
 // exports.patchAppointmentByPatient = (req, res, next) => {
 //     const { patient } = req.params;
 //     const body = req.body;
-//     const promises = [
-//         updateAppointment(patient, body),
-//         validateNhsNumber("appointments", "nhs_number", nhs_number),
-//     ];
-//     Promise.all(promises)
-//         .then((resolvedPromises) => {
-//             const appointment = resolvedPromises[0];
+//         updateAppointment(patient, body)
+//         .then((appointment) => {
 //             res.status(200).send({ appointment });
 //         })
 //         .catch(next);

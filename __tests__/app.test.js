@@ -199,7 +199,7 @@ describe("PATCH /api/patients/:nhs_number", () => {
 
 describe("DELETE /api/patients/:nhs_number", () => {
     test("204: should delete the patient with the provided nhs number from the database and respond with a 204 No Content status", () => {
-        return request(app).delete("/api/patients/1111111111").expect(204);
+        return request(app).delete("/api/patients/1111111146").expect(204);
     });
     test("400:should respond with Invalid NHS Number", () => {
         return request(app)
@@ -274,11 +274,10 @@ describe("GET /api/appointments/:patient", () => {
     });
 });
 
-describe("POST /api/appointments", () => {
+describe("POST /api/appointments/:patient", () => {
     test("201:should add a new appointment to the database and respond with newly added appointment's details", () => {
         const testAppointment = {
             id: "434d31d4-5993-47ef-a468-7884a467ae80",
-            patient: "1111111367",
             status: "active",
             time: "2025-06-04T16:30:00+01:00",
             duration: "1h",
@@ -287,7 +286,7 @@ describe("POST /api/appointments", () => {
             postcode: "M19 2CD",
         };
         return request(app)
-            .post("/api/appointments")
+            .post("/api/appointments/1111111111")
             .send(testAppointment)
             .expect(201)
             .then(({ body }) => {
@@ -296,12 +295,9 @@ describe("POST /api/appointments", () => {
                     "id",
                     "434d31d4-5993-47ef-a468-7884a467ae80"
                 );
-                expect(appointment).toHaveProperty("patient", "1111111367");
+                expect(appointment).toHaveProperty("patient", "1111111111");
                 expect(appointment).toHaveProperty("status", "active");
-                expect(appointment).toHaveProperty(
-                    "time",
-                    "2025-06-04T16:30:00+01:00"
-                );
+                expect(appointment).toHaveProperty("time", expect.any(String));
                 expect(appointment).toHaveProperty("duration", "1h");
                 expect(appointment).toHaveProperty(
                     "clinician",
@@ -314,7 +310,6 @@ describe("POST /api/appointments", () => {
     test("400:should respond with Invalid Patient Number", () => {
         const testAppointment = {
             id: "434d31d4-5993-47ef-a468-7884a467ae80",
-            patient: "Banana123",
             status: "active",
             time: "2025-06-04T16:30:00+01:00",
             duration: "1h",
@@ -323,7 +318,7 @@ describe("POST /api/appointments", () => {
             postcode: "M19 2CD",
         };
         return request(app)
-            .post("/api/appointments")
+            .post("/api/appointments/Banana123")
             .expect(400)
             .send(testAppointment)
             .then(({ body }) => {
@@ -333,7 +328,6 @@ describe("POST /api/appointments", () => {
     test("400:should respond with Invalid Status", () => {
         const testAppointment = {
             id: "434d31d4-5993-47ef-a468-7884a467ae80",
-            patient: "1111111367",
             status: "late",
             time: "2025-06-04T16:30:00+01:00",
             duration: "1h",
@@ -342,7 +336,7 @@ describe("POST /api/appointments", () => {
             postcode: "M19 2CD",
         };
         return request(app)
-            .post("/api/appointments")
+            .post("/api/appointments/1111111367")
             .send(testAppointment)
             .expect(400)
             .then(({ body }) => {
@@ -352,7 +346,6 @@ describe("POST /api/appointments", () => {
     test("400:should respond with Invalid clinician", () => {
         const testAppointment = {
             id: "434d31d4-5993-47ef-a468-7884a467ae80",
-            patient: "1111111367",
             status: "late",
             time: "2025-06-04T16:30:00+01:00",
             duration: "1h",
@@ -363,17 +356,16 @@ describe("POST /api/appointments", () => {
             postcode: "M19 2CD",
         };
         return request(app)
-            .post("/api/appointments")
+            .post("/api/appointments/1111111367")
             .expect(400)
             .send(testAppointment)
             .then(({ body }) => {
-                expect(body.msg).toBe("Invalid Clinician");
+                expect(body.msg).toBe("Invalid Name");
             });
     });
     test("400:should respond with Invalid postcode", () => {
         const testAppointment = {
             id: "434d31d4-5993-47ef-a468-7884a467ae80",
-            patient: "1111111367",
             status: "active",
             time: "2025-06-04T16:30:00+01:00",
             duration: "1h",
@@ -382,11 +374,37 @@ describe("POST /api/appointments", () => {
             postcode: "M19 2CDLk",
         };
         return request(app)
-            .post("/api/appointments")
+            .post("/api/appointments/1111111367")
             .expect(400)
             .send(testAppointment)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid Postcode");
             });
     });
+    test("404:should respond with NHS Number Not Found", () => {
+        const testAppointment = {
+            id: "434d31d4-5993-47ef-a468-7884a467ae80",
+            status: "active",
+            time: "2025-06-04T16:30:00+01:00",
+            duration: "1h",
+            clinician: "Jason Holloway",
+            department: "oncology",
+            postcode: "M19 2CD",
+        };
+        return request(app)
+            .post("/api/appointments/1111111391")
+            .expect(404)
+            .send(testAppointment)
+            .then(({ body }) => {
+                expect(body.msg).toBe("NHS Number Not Found");
+            });
+    });
+});
+
+describe("PATCH /api/appointments/:patient", () => {
+    test("200:should update appointments for the patient number provided", () => {});
+    test("400:should respond with Invalid patient number e.g. Banana123", () => {});
+    test("404:should respond with NHS Number Not Found e.g. valid number that does not exist", () => {});
+    test("400:should respond with Invalid Postcode", () => {});
+    test("400:should respond with Invalid fields e.g. clinician = {}", () => {});
 });

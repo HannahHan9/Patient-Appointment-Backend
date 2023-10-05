@@ -29,9 +29,7 @@
         "description": "updates patient's name or postcode for the provided nhs number",
         "queries": [],
         "requestBodyFormat": {
-            "nhs_number": "1609079019",
             "name": "Alice Smith",
-            "date_of_birth": "1990-05-15",
             "postcode": "M19 2DB"
         },
         "exampleResponse": {
@@ -64,9 +62,8 @@
         "description": "creates and serves a new appointment for the provided patient",
         "queries": [],
         "requestBodyFormat": {
-            // should the id on appointments table be a serial key as it will be automatically generated
             "patient": "1609079019",
-            "status": "missed",
+            "status": "active",
             "time": "2022-10-28T10:30:00+01:00",
             "duration": "30m",
             "clinician": "Alice Johnson",
@@ -76,7 +73,7 @@
         "exampleResponse": {
             "id": "5d5c84b6-9e88-4164-b7ec-5b1d11ca49a2",
             "patient": "1609079019",
-            "status": "missed",
+            "status": "active",
             "time": "2022-10-28T10:30:00+01:00",
             "duration": "30m",
             "clinician": "Alice Johnson",
@@ -87,7 +84,23 @@
     "PATCH /api/appointments/:patient": {
         "description": "updates an appointment for the provided patient",
         "queries": [],
-        "requestBodyFormat": {},
-        "exampleResponse": {}
+        "requestBodyFormat": {
+            "status": "attended",
+            "time": "2018-01-21T16:30:00+00:00",
+            "duration": "15m",
+            "clinician": "Jason Holloway",
+            "department": "oncology",
+            "postcode": "UB56 7XQ"
+        },
+        "exampleResponse": {
+            "patient": "1373645350",
+            "status": "attended",
+            "time": "2018-01-21T16:30:00+00:00",
+            "duration": "15m",
+            "clinician": "Jason Holloway",
+            "department": "oncology",
+            "postcode": "UB56 7XQ",
+            "id": "343d31d4-5993-47ef-a468-7884a467ae80"
+        }
     }
 }

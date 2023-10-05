@@ -101,7 +101,13 @@ exports.removePatient = (nhs_number) => {
         });
     }
     return db
-        .query(`DELETE FROM patients WHERE nhs_number = $1;`, [nhs_number])
+        .query(`DELETE FROM appointments WHERE patient = $1;`, [nhs_number])
+        .then(() => {
+            return db.query(
+                `DELETE FROM patients WHERE nhs_number = $1 RETURNING *;`,
+                [nhs_number]
+            );
+        })
         .then(({ rows }) => {
             if (!rows[0]) {
                 return Promise.reject({
@@ -139,10 +145,10 @@ exports.insertAppointment = ({
     time,
     duration,
     clinician,
-    deparment,
+    department,
     postcode,
 }) => {
-    if (!validateNhsNumber(nhs_number)) {
+    if (!validateNhsNumber(patient)) {
         return Promise.reject({
             status: 400,
             msg: "Invalid NHS Number",
@@ -154,7 +160,7 @@ exports.insertAppointment = ({
             msg: "Invalid Postcode",
         });
     }
-    
+
     return db
         .query(
             `INSERT INTO appointments (id, patient, status, time, duration, clinician, department, postcode) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;`,
@@ -170,8 +176,22 @@ exports.insertAppointment = ({
             ]
         )
         .then(({ rows }) => {
-            return rows;
+            return rows[0];
         });
 };
 
-// exports.updateAppointment = () => {};
+exports.updateMissedAppointments = () => {
+    console.log("updating missed appointments...");
+    return db
+        .query(
+            `UPDATE appointments
+    SET status = $1 WHERE time + $2 < CURRENT_DATE AND status = $3 RETURNING *;`,
+            ["missed", "00:15:00", "active"]
+        )
+        .then(({ rows }) => {
+            return db.query(`SELECT * FROM appointments;`);
+        })
+        .then(({ rows }) => {});
+};
+
+//exports.updateAppointment =() => {}

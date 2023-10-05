@@ -15,7 +15,7 @@ const seed = (patientsData, appointmentsData) => {
         })
         .then(() => {
             return db.query(
-                `CREATE TABLE appointments (id VARCHAR(36) PRIMARY KEY, patient VARCHAR(10) NOT NULL REFERENCES patients(nhs_number), status text CHECK (status IN ('active', 'attended', 'missed', 'cancelled')), time TIMESTAMP WITH TIME ZONE, duration VARCHAR(6) NOT NULL, clinician VARCHAR(40) NOT NULL, department VARCHAR(20) NOT NULL, postcode VARCHAR(8) NOT NULL);`
+                `CREATE TABLE appointments (id VARCHAR(36) PRIMARY KEY, patient VARCHAR(10) NOT NULL REFERENCES patients(nhs_number) ON DELETE CASCADE, status text CHECK (status IN ('active', 'attended', 'missed', 'cancelled')), time TIMESTAMP WITH TIME ZONE, duration VARCHAR(6) NOT NULL, clinician VARCHAR(40) NOT NULL, department VARCHAR(20) NOT NULL, postcode VARCHAR(8) NOT NULL);`
             );
         })
         .then(() => {
@@ -35,7 +35,5 @@ const seed = (patientsData, appointmentsData) => {
             return db.query(insertAppointmentsStr);
         });
 };
-
-// ON DELETE CASCADE on appoinments table to delete the appointments linked to deleted patient?
 
 module.exports = seed;
