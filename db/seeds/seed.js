@@ -36,4 +36,6 @@ const seed = (patientsData, appointmentsData) => {
         });
 };
 
+// ON DELETE CASCADE on appoinments table to delete the appointments linked to deleted patient?
+
 module.exports = seed;

@@ -1,5 +1,4 @@
 const db = require("./db/connection");
-const fs = require("fs/promises");
 const {
     validateNhsNumber,
     validateDateOfBirth,
@@ -62,14 +61,14 @@ exports.updatePatient = (nhs_number, body) => {
     }
     const { name, postcode } = body;
     const valueToUpdate = name || postcode;
-    let fieldToUpdate = "name"
-    if(postcode){
-        fieldToUpdate = "postcode"
-    } else if (!name && !postcode){
+    let fieldToUpdate = "name";
+    if (postcode) {
+        fieldToUpdate = "postcode";
+    } else if (!name && !postcode) {
         return Promise.reject({
             status: 400,
             msg: "Cannot update invalid fields",
-        })
+        });
     }
     if (valueToUpdate === postcode && !validatePostcode(valueToUpdate)) {
         return Promise.reject({
@@ -83,20 +82,26 @@ exports.updatePatient = (nhs_number, body) => {
             [valueToUpdate, nhs_number]
         )
         .then(({ rows }) => {
-            return rows[0];
+            if (!rows[0]) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "NHS Number Not Found",
+                });
+            } else {
+                return rows[0];
+            }
         });
 };
 
-exports.removePatient = () => {};
-
-exports.fetchAppointment = (patient) => {
-    if (!validateNhsNumber(patient)) {
-        return Promise.reject({ status: 400, msg: "Invalid NHS Number" });
+exports.removePatient = (nhs_number) => {
+    if (!validateNhsNumber(nhs_number)) {
+        return Promise.reject({
+            status: 400,
+            msg: "Invalid NHS Number",
+        });
     }
     return db
-        .query(`SELECT * FROM appointments WHERE nhs_number = $1;`, [
-            nhs_number,
-        ])
+        .query(`DELETE FROM patients WHERE nhs_number = $1;`, [nhs_number])
         .then(({ rows }) => {
             if (!rows[0]) {
                 return Promise.reject({
@@ -109,6 +114,64 @@ exports.fetchAppointment = (patient) => {
         });
 };
 
-exports.insertAppointment = (appointment) => {};
+exports.fetchAppointment = (patient) => {
+    if (!validateNhsNumber(patient)) {
+        return Promise.reject({ status: 400, msg: "Invalid NHS Number" });
+    }
+    return db
+        .query(`SELECT * FROM appointments WHERE patient = $1;`, [patient])
+        .then(({ rows }) => {
+            if (!rows[0]) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "NHS Number Not Found",
+                });
+            } else {
+                return rows[0];
+            }
+        });
+};
 
-exports.updateAppointment = () => {};
+exports.insertAppointment = ({
+    id,
+    patient,
+    status,
+    time,
+    duration,
+    clinician,
+    deparment,
+    postcode,
+}) => {
+    if (!validateNhsNumber(nhs_number)) {
+        return Promise.reject({
+            status: 400,
+            msg: "Invalid NHS Number",
+        });
+    }
+    if (!validatePostcode(postcode)) {
+        return Promise.reject({
+            status: 400,
+            msg: "Invalid Postcode",
+        });
+    }
+    
+    return db
+        .query(
+            `INSERT INTO appointments (id, patient, status, time, duration, clinician, department, postcode) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;`,
+            [
+                id,
+                patient,
+                status,
+                time,
+                duration,
+                clinician,
+                department,
+                postcode,
+            ]
+        )
+        .then(({ rows }) => {
+            return rows;
+        });
+};
+
+// exports.updateAppointment = () => {};

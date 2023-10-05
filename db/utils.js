@@ -65,7 +65,7 @@ const validatePostcode = (postcode) => {
     return regex.test(postcode);
 };
 // console.log(validateDateOfBirth("19972-04-05"));
-console.log(validateNhsNumber("1111111146"))
+// console.log(validateNhsNumber("1111111146"))
 module.exports = {
     formatPatients,
     formatAppointments,

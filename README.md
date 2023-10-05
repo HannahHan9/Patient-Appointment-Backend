@@ -4,7 +4,7 @@ This is an MVP tool called the Patient Appointment Network Data Application (PAN
 
 ## Built in:
 
-- JS using Express and PSQL
+-   JS using Express and PSQL
 
 ## Getting Started
 
@@ -46,10 +46,10 @@ Run all tests for the project.
 npm test
 ```
 
-# How to get the API running
+## How to get the API running
 
--   please run npm start
+-   please run `npm start` for the server to listen for requests on port 9090
 
-# How to interact with the API
+## How to interact with the API
 
--
+-   Please refer to the endpoints.json file for detailed information on each endpoint

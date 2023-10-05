@@ -11,10 +11,10 @@ afterAll(() => db.end());
 describe("GET /api/patients/:nhs_number", () => {
     test("200:should respond with an individual patient", () => {
         return request(app)
-            .get("/api/patients/1609079019")
+            .get("/api/patients/1111111111")
             .expect(200)
             .then(({ body }) => {
-                expect(body.patient).toHaveProperty("nhs_number", "1609079019");
+                expect(body.patient).toHaveProperty("nhs_number", "1111111111");
                 expect(body.patient).toHaveProperty("name", expect.any(String));
                 expect(body.patient).toHaveProperty(
                     "date_of_birth",
@@ -129,7 +129,7 @@ describe("POST /api/patients", () => {
 });
 
 describe("PATCH /api/patients/:nhs_number", () => {
-    test.only("200: should update patient's name", () => {
+    test("200: should update patient's name", () => {
         const testBody = { name: "Alice Smith" };
         return request(app)
             .patch("/api/patients/1111111111")
@@ -137,47 +137,39 @@ describe("PATCH /api/patients/:nhs_number", () => {
             .expect(200)
             .then(({ body }) => {
                 const { updatedPatient } = body;
-                expect(updatedPatient).toHaveProperty("nhs_number", "1111111111");
+                expect(updatedPatient).toHaveProperty(
+                    "nhs_number",
+                    "1111111111"
+                );
                 expect(updatedPatient).toHaveProperty("name", "Alice Smith");
             });
     });
     test("200: should update patient's postcode", () => {
         const testBody = { postcode: "M19 2DB" };
         return request(app)
-            .patch("/api/patients/1609079019")
+            .patch("/api/patients/1111111111")
             .send(testBody)
             .expect(200)
             .then(({ body }) => {
-                const { patient } = body;
-                expect(patient).toHaveProperty("nhs_number", "1609079019");
-                expect(patient).toMatchObject({
-                    nhs_number: "1609079019",
-                    name: "Alice Smith",
+                const { updatedPatient } = body;
+                expect(updatedPatient).toHaveProperty(
+                    "nhs_number",
+                    "1111111111"
+                );
+                expect(updatedPatient).toMatchObject({
+                    nhs_number: "1111111111",
+                    name: "Alice Johnson",
                     date_of_birth: "1990-05-15",
                     postcode: "M19 2DB",
                 });
             });
     });
-    test("200: should ignore other properties passed in the request body", () => {
-        const testBody = { nhs_number: "1609079019", name: "Alice Smith" };
-        return request(app)
-            .patch("/api/patients/1609079019")
-            .send(testBody)
-            .expect(200)
-            .then(({ body }) => {
-                const { patient } = body;
-                expect(patient).toHaveProperty("nhs_number", "1609079019");
-                expect(patient).toHaveProperty("name", "Jane Doe");
-            });
-    });
-    // is this test necessary
     test("400:should respond with Invalid NHS Number", () => {
         const testBody = { name: "Alice Smith" };
         return request(app)
             .patch("/api/patients/Banana123")
             .send(testBody)
             .expect(400)
-            .send(testBody)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid NHS Number");
             });
@@ -185,10 +177,9 @@ describe("PATCH /api/patients/:nhs_number", () => {
     test("404:should respond with NHS Number Not Found for a valid nhs number that does not exist", () => {
         const testBody = { name: "Alice Smith" };
         return request(app)
-            .patch("/api/patient/4401654447")
+            .patch("/api/patients/4401654447")
             .send(testBody)
             .expect(404)
-            .send(testBody)
             .then(({ body }) => {
                 expect(body.msg).toBe("NHS Number Not Found");
             });
@@ -206,9 +197,9 @@ describe("PATCH /api/patients/:nhs_number", () => {
     });
 });
 
-xdescribe("DELETE /api/patients/:nhs_number", () => {
+describe("DELETE /api/patients/:nhs_number", () => {
     test("204: should delete the patient with the provided nhs number from the database and respond with a 204 No Content status", () => {
-        return request(app).delete("/api/patients/1609079019").expect(204);
+        return request(app).delete("/api/patients/1111111111").expect(204);
     });
     test("400:should respond with Invalid NHS Number", () => {
         return request(app)
@@ -228,24 +219,21 @@ xdescribe("DELETE /api/patients/:nhs_number", () => {
     });
 });
 
-xdescribe("GET /api/appointments/:patient", () => {
+describe("GET /api/appointments/:patient", () => {
     test("200:should respond with an appointment or appointments by patient", () => {
         return request(app)
-            .get("/api/appointments/1609079019")
+            .get("/api/appointments/1111111138")
             .expect(200)
             .then(({ body }) => {
                 expect(body.appointment).toHaveProperty(
                     "id",
-                    "5d5c84b6-9e88-4164-b7ec-5b1d11ca49a2"
+                    "6f7d8e9f-aabb-4342-8910-123456789abc"
                 );
                 expect(body.appointment).toHaveProperty(
                     "patient",
-                    "1431315257"
+                    "1111111138"
                 );
-                expect(body.appointment).toHaveProperty(
-                    "status",
-                    expect.any(String)
-                );
+                expect(body.appointment).toHaveProperty("status", "attended");
                 expect(body.appointment).toHaveProperty(
                     "time",
                     expect.any(String)
@@ -266,6 +254,139 @@ xdescribe("GET /api/appointments/:patient", () => {
                     "postcode",
                     expect.any(String)
                 );
+            });
+    });
+    test("400:should respond with Invalid input for an invalid patient number", () => {
+        return request(app)
+            .get("/api/appointments/Banana123")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid NHS Number");
+            });
+    });
+    test("404:should respond with valid NHS Number when passed a number that does not exist", () => {
+        return request(app)
+            .get("/api/appointments/4401654447")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("NHS Number Not Found");
+            });
+    });
+});
+
+describe("POST /api/appointments", () => {
+    test("201:should add a new appointment to the database and respond with newly added appointment's details", () => {
+        const testAppointment = {
+            id: "434d31d4-5993-47ef-a468-7884a467ae80",
+            patient: "1111111367",
+            status: "active",
+            time: "2025-06-04T16:30:00+01:00",
+            duration: "1h",
+            clinician: "Jason Holloway",
+            department: "oncology",
+            postcode: "M19 2CD",
+        };
+        return request(app)
+            .post("/api/appointments")
+            .send(testAppointment)
+            .expect(201)
+            .then(({ body }) => {
+                const { appointment } = body;
+                expect(appointment).toHaveProperty(
+                    "id",
+                    "434d31d4-5993-47ef-a468-7884a467ae80"
+                );
+                expect(appointment).toHaveProperty("patient", "1111111367");
+                expect(appointment).toHaveProperty("status", "active");
+                expect(appointment).toHaveProperty(
+                    "time",
+                    "2025-06-04T16:30:00+01:00"
+                );
+                expect(appointment).toHaveProperty("duration", "1h");
+                expect(appointment).toHaveProperty(
+                    "clinician",
+                    "Jason Holloway"
+                );
+                expect(appointment).toHaveProperty("department", "oncology");
+                expect(appointment).toHaveProperty("postcode", "M19 2CD");
+            });
+    });
+    test("400:should respond with Invalid Patient Number", () => {
+        const testAppointment = {
+            id: "434d31d4-5993-47ef-a468-7884a467ae80",
+            patient: "Banana123",
+            status: "active",
+            time: "2025-06-04T16:30:00+01:00",
+            duration: "1h",
+            clinician: "Jason Holloway",
+            department: "oncology",
+            postcode: "M19 2CD",
+        };
+        return request(app)
+            .post("/api/appointments")
+            .expect(400)
+            .send(testAppointment)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid NHS Number");
+            });
+    });
+    test("400:should respond with Invalid Status", () => {
+        const testAppointment = {
+            id: "434d31d4-5993-47ef-a468-7884a467ae80",
+            patient: "1111111367",
+            status: "late",
+            time: "2025-06-04T16:30:00+01:00",
+            duration: "1h",
+            clinician: "Jason Holloway",
+            department: "oncology",
+            postcode: "M19 2CD",
+        };
+        return request(app)
+            .post("/api/appointments")
+            .send(testAppointment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid Status");
+            });
+    });
+    test("400:should respond with Invalid clinician", () => {
+        const testAppointment = {
+            id: "434d31d4-5993-47ef-a468-7884a467ae80",
+            patient: "1111111367",
+            status: "late",
+            time: "2025-06-04T16:30:00+01:00",
+            duration: "1h",
+            clinician: (notName) => {
+                return notName;
+            },
+            department: "oncology",
+            postcode: "M19 2CD",
+        };
+        return request(app)
+            .post("/api/appointments")
+            .expect(400)
+            .send(testAppointment)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid Clinician");
+            });
+    });
+    test("400:should respond with Invalid postcode", () => {
+        const testAppointment = {
+            id: "434d31d4-5993-47ef-a468-7884a467ae80",
+            patient: "1111111367",
+            status: "active",
+            time: "2025-06-04T16:30:00+01:00",
+            duration: "1h",
+            clinician: "Jason Holloway",
+            department: "oncology",
+            postcode: "M19 2CDLk",
+        };
+        return request(app)
+            .post("/api/appointments")
+            .expect(400)
+            .send(testAppointment)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid Postcode");
             });
     });
 });
